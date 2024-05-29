@@ -20,8 +20,22 @@ export class Board {
     return this.cells.map((row) => row.join("")).join("\n") + "\n";
   }
 
-  drop() {
-    this.cells[0][1] = "X";
+  drop(tetromino) {
+    if (this.isDropping()) {
+      throw new Error("already falling");
+    }
+    this.cells[0][1] = tetromino;
+  }
+
+  isDropping() {
+    for (let row = 0; row < this.height; row++) {
+      for (let column = 0; column < this.width; column++) {
+        if (this.cells[row][column] !== ".") {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   tick() {

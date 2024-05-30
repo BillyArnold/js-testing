@@ -5,6 +5,7 @@ export class Board {
   constructor(width, height) {
     this.width = width;
     this.height = height;
+    this.tetromino = null;
 
     this.cells = [];
 
@@ -21,21 +22,18 @@ export class Board {
   }
 
   drop(tetromino) {
-    if (this.isDropping()) {
+    if (this.hasFalling()) {
       throw new Error("already falling");
     }
-    this.cells[0][1] = tetromino;
+    this.tetromino = {
+      shape: tetromino,
+      status: "dropping",
+    };
+    this.cells[0][1] = this.tetromino.shape;
   }
 
-  isDropping() {
-    for (let row = 0; row < this.height; row++) {
-      for (let column = 0; column < this.width; column++) {
-        if (this.cells[row][column] !== ".") {
-          return true;
-        }
-      }
-    }
-    return false;
+  hasFalling() {
+    return this.tetromino && this.tetromino.status === "dropping";
   }
 
   tick() {
@@ -43,9 +41,11 @@ export class Board {
     let positionToUpdate = [];
     for (let row = 0; row < this.height; row++) {
       for (let column = 0; column < this.width; column++) {
-        if (this.cells[row][column] === "X" && row < this.height - 1) {
+        if (this.cells[row][column] === this.tetromino.shape && row < this.height - 1) {
           positionToClear.push({ row, column });
           positionToUpdate.push({ row: row + 1, column });
+        } else if (this.cells[row][column] === this.tetromino.shape && row === this.height - 1) {
+          this.tetromino.status = "stopped";
         }
       }
     }
@@ -54,7 +54,7 @@ export class Board {
       this.cells[row][column] = ".";
     });
     positionToUpdate.forEach(({ row, column }) => {
-      this.cells[row][column] = "X";
+      this.cells[row][column] = this.tetromino.shape;
     });
   }
 }

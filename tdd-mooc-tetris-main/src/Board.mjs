@@ -41,10 +41,17 @@ export class Board {
     let positionToUpdate = [];
     for (let row = 0; row < this.height; row++) {
       for (let column = 0; column < this.width; column++) {
-        if (this.cells[row][column] === this.tetromino.shape && row < this.height - 1) {
+        if (
+          this.cells[row][column] === this.tetromino.shape &&
+          row < this.height - 1 &&
+          this.cells[row + 1][column] === "."
+        ) {
           positionToClear.push({ row, column });
           positionToUpdate.push({ row: row + 1, column });
-        } else if (this.cells[row][column] === this.tetromino.shape && row === this.height - 1) {
+        } else if (
+          this.cells[row][column] === this.tetromino.shape &&
+          (row === this.height - 1 || this.cells[row + 1][column] !== ".")
+        ) {
           this.tetromino.status = "stopped";
         }
       }
